@@ -22,6 +22,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JTextField input;
 	private JPanel vzdevek;
 	private JTextField vzdevekInput;
+	private JPanel online;
+	private JTextArea onlineOutput;
 
 	public ChatFrame() {
 		super();
@@ -42,6 +44,21 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		vzdevekConstraint.gridy = 0;
 		pane.add(vzdevek, vzdevekConstraint);
 		vzdevek.addKeyListener(this);
+		
+		this.online = new JPanel();
+		JLabel napisOnline = new JLabel("Online:");
+		this.onlineOutput = new JTextArea(20,10);
+		FlowLayout onlineFlow = new FlowLayout();
+		online.setLayout(onlineFlow);
+		online.add(napisOnline);
+		online.add(onlineOutput);
+		GridBagConstraints onlineConstraint = new GridBagConstraints();
+		onlineConstraint.gridx = 1;
+		onlineConstraint.gridy = 0;
+		onlineConstraint.gridheight = 2;
+		onlineConstraint.weighty = 0.0;
+		pane.add(online, onlineConstraint);
+		online.addKeyListener(this);
 		
 
 		this.output = new JTextArea(20, 40);

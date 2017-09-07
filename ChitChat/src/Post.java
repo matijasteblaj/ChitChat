@@ -8,9 +8,9 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class Post {
 
-	public static void post(String username) throws URISyntaxException, ClientProtocolException, IOException {
+	public static void main(String[] args) throws URISyntaxException, ClientProtocolException, IOException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/users")
-		          .addParameter("username", username)
+		          .addParameter("username", "Matija")
 		          .build();
 		String responseBody = Request.Post(uri)
 		                               .execute()

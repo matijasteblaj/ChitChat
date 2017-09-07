@@ -10,7 +10,7 @@ public class Delete {
 
 	public static void main(String[] args) throws URISyntaxException, ClientProtocolException, IOException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/users")
-		          .addParameter("username", "SteblajM15")
+		          .addParameter("username", "Matija")
 		          .build();
 		String responseBody = Request.Delete(uri)
 		                               .execute()
