@@ -8,14 +8,14 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class Delete {
 
-	public static void main(String[] args) throws URISyntaxException, ClientProtocolException, IOException {
+	public static String delete(String username) throws URISyntaxException, ClientProtocolException, IOException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/users")
-		          .addParameter("username", "Matija")
+		          .addParameter("username", username)
 		          .build();
 		String responseBody = Request.Delete(uri)
 		                               .execute()
 		                               .returnContent()
 		                               .asString();
-		System.out.println(responseBody);
+		return(responseBody);
 	}
 }

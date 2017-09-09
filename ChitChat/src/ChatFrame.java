@@ -8,13 +8,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import org.apache.http.client.ClientProtocolException;
 
 public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
@@ -24,8 +30,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JTextField vzdevekInput;
 	private JPanel online;
 	private JTextArea onlineOutput;
+	private JButton prijava;
+	private JButton odjava;
 
-	public ChatFrame() {
+	public ChatFrame() throws ClientProtocolException, URISyntaxException, IOException {
 		super();
 		setTitle("ChitChat");
 		Container pane = this.getContentPane();
@@ -39,6 +47,15 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		vzdevek.setLayout(vzdevekFlow);
 		vzdevek.add(napis);
 		vzdevek.add(vzdevekInput);
+		this.prijava = new JButton("Prijava");
+		prijava.addActionListener(this);
+		prijava.setActionCommand("Prijava");
+		vzdevek.add(prijava);
+		this.odjava = new JButton("Odjava");
+		odjava.addActionListener(this);
+		odjava.setActionCommand("Odjava");
+		odjava.setEnabled(false);
+		vzdevek.add(odjava);
 		GridBagConstraints vzdevekConstraint = new GridBagConstraints();
 		vzdevekConstraint.gridx = 0;
 		vzdevekConstraint.gridy = 0;
@@ -48,6 +65,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.online = new JPanel();
 		JLabel napisOnline = new JLabel("Online:");
 		this.onlineOutput = new JTextArea(20,10);
+		this.onlineOutput.setEditable(false);
 		FlowLayout onlineFlow = new FlowLayout();
 		online.setLayout(onlineFlow);
 		online.add(napisOnline);
@@ -56,7 +74,6 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		onlineConstraint.gridx = 1;
 		onlineConstraint.gridy = 0;
 		onlineConstraint.gridheight = 2;
-		onlineConstraint.weighty = 0.0;
 		pane.add(online, onlineConstraint);
 		online.addKeyListener(this);
 		
@@ -101,6 +118,27 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		String action = e.getActionCommand();
+		if (action.equals("Prijava")){
+			try {
+				this.addMessage("Server", Post.post(vzdevekInput.getText()));
+				this.vzdevekInput.setEditable(false);
+				this.prijava.setEnabled(false);
+				this.odjava.setEnabled(true);
+			} catch (URISyntaxException | IOException e1) {
+				e1.printStackTrace();
+			}
+		} else if(action.equals("Odjava")){
+			try {
+				this.addMessage("Server", Delete.delete(vzdevekInput.getText()));
+				this.vzdevekInput.setEditable(true);
+				this.prijava.setEnabled(true);
+				this.odjava.setEnabled(false);
+			} catch (URISyntaxException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	@Override
