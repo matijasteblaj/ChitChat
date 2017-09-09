@@ -15,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -54,7 +53,6 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.odjava = new JButton("Odjava");
 		odjava.addActionListener(this);
 		odjava.setActionCommand("Odjava");
-		odjava.setEnabled(false);
 		vzdevek.add(odjava);
 		GridBagConstraints vzdevekConstraint = new GridBagConstraints();
 		vzdevekConstraint.gridx = 0;
@@ -116,15 +114,20 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.output.setText(chat + person + ": " + message + "\n");
 	}
 	
+	public void refreshOnline(String[] seznamOnline){
+		String text = "";
+		for (String oseba : seznamOnline){
+			text = text + oseba + "\n";
+		}
+		this.onlineOutput.setText(text);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
 		if (action.equals("Prijava")){
 			try {
 				this.addMessage("Server", Post.post(vzdevekInput.getText()));
-				this.vzdevekInput.setEditable(false);
-				this.prijava.setEnabled(false);
-				this.odjava.setEnabled(true);
 			} catch (URISyntaxException | IOException e1) {
 				e1.printStackTrace();
 			}
@@ -132,8 +135,6 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			try {
 				this.addMessage("Server", Delete.delete(vzdevekInput.getText()));
 				this.vzdevekInput.setEditable(true);
-				this.prijava.setEnabled(true);
-				this.odjava.setEnabled(false);
 			} catch (URISyntaxException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
