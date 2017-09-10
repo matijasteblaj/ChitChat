@@ -1,4 +1,3 @@
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -44,7 +43,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JLabel inputLabel;
 	private JLabel prejemnikLabel;
 	private JTabbedPane tabbedPane;
-	private HashMap<String, JTextArea> tabSlovar;
+	private HashMap<String, JTextArea> tabTextSlovar;
 	
 	public ChatFrame() throws ClientProtocolException, URISyntaxException, IOException {
 		super();
@@ -101,10 +100,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 		JScrollPane scrollPane = new JScrollPane(output);
 		this.tabbedPane = new JTabbedPane();
-		tabbedPane.addTab("Default", scrollPane);
+		this.tabTextSlovar = new HashMap<String, JTextArea>();
+		tabbedPane.add("Vsi", scrollPane);
+		tabTextSlovar.put("Vsi", output);
 		pane.add(tabbedPane, outputConstraint);
-		this.tabSlovar = new HashMap<String, JTextArea>();
-		tabSlovar.put("Default", this.output);
 
 		this.inputPanel = new JPanel();
 		this.input = new JTextField(40);
@@ -137,7 +136,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	 */
 	public void addMessage(String person, String message) {
 		//Doda besedilo iz "input" v trenutno izbrani tab
-		JTextArea output = this.tabSlovar.get(this.tabbedPane.getTitleAt(
+		JTextArea output = this.tabTextSlovar.get(this.tabbedPane.getTitleAt(
 				this.tabbedPane.getSelectedIndex()));
 		String chat = output.getText();
 		output.setText(chat + person + ": " + message + "\n");
@@ -152,10 +151,16 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	private void addTab(String prejemnik){
-		JTextArea textArea = new JTextArea(20, 40);
-		textArea.setEditable(false);
-		this.tabbedPane.add(prejemnik, textArea);
-		this.tabSlovar.put(prejemnik, textArea);
+		if (!this.tabTextSlovar.containsKey(prejemnik)){
+			JTextArea textArea = new JTextArea(20, 40);
+			textArea.setEditable(false);
+			JScrollPane scrollPane = new JScrollPane(textArea);
+			this.tabbedPane.add(prejemnik, scrollPane);
+			this.tabTextSlovar.put(prejemnik, textArea);
+		}
+		System.out.println(prejemnik);
+		System.out.println(tabbedPane.getTabCount());
+		this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
 	}
 	
 	private String[] extractUsername(String string) {
@@ -206,9 +211,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void keyTyped(KeyEvent e) {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
+				this.addTab(this.prejemnik.getText());
 				this.addMessage(this.vzdevekInput.getText(), this.input.getText());
 				this.input.setText("");
-				this.addTab(this.prejemnik.getText());
 			}
 		}
 	}
