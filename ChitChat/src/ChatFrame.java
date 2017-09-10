@@ -1,3 +1,4 @@
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -10,17 +11,23 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.apache.http.client.ClientProtocolException;
 
+@SuppressWarnings("serial")
 public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
 	private JTextArea output;
@@ -31,7 +38,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JTextArea onlineOutput;
 	private JButton prijava;
 	private JButton odjava;
-
+	private JPanel inputPanel;
+	private JTextField prejemnik;
+	private JLabel inputLabel;
+	private JLabel prejemnikLabel;
+	private JTabbedPane tabbedPane;
 	public ChatFrame() throws ClientProtocolException, URISyntaxException, IOException {
 		super();
 		setTitle("ChitChat");
@@ -62,7 +73,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 		this.online = new JPanel();
 		JLabel napisOnline = new JLabel("Online:");
-		this.onlineOutput = new JTextArea(20,10);
+		this.onlineOutput = new JTextArea(30,12);
 		this.onlineOutput.setEditable(false);
 		FlowLayout onlineFlow = new FlowLayout();
 		online.setLayout(onlineFlow);
@@ -86,16 +97,26 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		outputConstraint.weighty = 1.0;
 		
 		JScrollPane scrollPane = new JScrollPane(output);
-		pane.add(scrollPane, outputConstraint);
-		
+		this.tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("Default", scrollPane);
+		pane.add(tabbedPane, outputConstraint);
+
+		this.inputPanel = new JPanel();
 		this.input = new JTextField(40);
+		this.prejemnikLabel = new JLabel("Prejemnik:");
+		this.inputLabel = new JLabel("Sporocilo:");
 		GridBagConstraints inputConstraint = new GridBagConstraints();
 		inputConstraint.gridx = 0;
 		inputConstraint.gridy = 2;
 		inputConstraint.fill = GridBagConstraints.HORIZONTAL;
 		inputConstraint.weightx = 1.0;
-		pane.add(input, inputConstraint);
 		input.addKeyListener(this);
+		this.prejemnik = new JTextField("Vsi", 20);
+		inputPanel.add(prejemnikLabel);
+		inputPanel.add(prejemnik);
+		inputPanel.add(inputLabel);
+		inputPanel.add(input);
+		pane.add(inputPanel, inputConstraint);
 		
 		addWindowListener(new WindowAdapter(){
 			public void windowOpened(WindowEvent e) {
@@ -109,9 +130,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	 * @param person - the person sending the message
 	 * @param message - the message content
 	 */
-	public void addMessage(String person, String message) {
-		String chat = this.output.getText();
-		this.output.setText(chat + person + ": " + message + "\n");
+	public void addMessage(String person, String message, JTextArea output) {
+		String chat = output.getText();
+		output.setText(chat + person + ": " + message + "\n");
 	}
 	
 	public void refreshOnline(String[] seznamOnline){
@@ -122,23 +143,58 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.onlineOutput.setText(text);
 	}
 	
+	private void addTab(String prejemnik){
+		JTextArea textArea = new JTextArea(20, 40);
+		textArea.setEditable(false);
+		this.tabbedPane.add(prejemnik, textArea);
+	}
+	
+	private String[] extractUsername(String string) {
+		List<String> seznam = new ArrayList<String>();
+		String pattern = "username\":\"(?<username>.*?)\"";
+		Pattern r = Pattern.compile(pattern);
+		Matcher m = r.matcher(string);
+		while (m.find()){
+			seznam.add(m.group("username"));
+		}
+		String[] navadenSeznam = new String[seznam.size()];
+		seznam.toArray(navadenSeznam);
+		return navadenSeznam;
+	}
+	
+	public void osvezi(){
+		String[] seznamOnline;
+		try {
+			seznamOnline = extractUsername(Get.get());
+			refreshOnline(seznamOnline);
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
 		if (action.equals("Prijava")){
 			try {
-				this.addMessage("Server", Post.post(vzdevekInput.getText()));
+				JTextArea output = this.tabbedPane.getSelectedComponent();
+				this.addMessage("Server", Post.post(vzdevekInput.getText()), this.tabbedPane.getcomponent());
 			} catch (URISyntaxException | IOException e1) {
 				e1.printStackTrace();
 			}
 		} else if(action.equals("Odjava")){
 			try {
-				this.addMessage("Server", Delete.delete(vzdevekInput.getText()));
+				this.addMessage("Server", Delete.delete(vzdevekInput.getText()), this.tabbedPane.getComponentAt(
+						this.tabbedPane.getSelectedIndex()));
 				this.vzdevekInput.setEditable(true);
 			} catch (URISyntaxException | IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+		} else if(action.equals("Osvezi")){
+			osvezi();
 		}
 	}
 
@@ -146,8 +202,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void keyTyped(KeyEvent e) {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
-				this.addMessage(this.vzdevekInput.getText(), this.input.getText());
+				this.addMessage(this.vzdevekInput.getText(), this.input.getText(), this.tabbedPane.getComponentAt(
+						this.tabbedPane.getSelectedIndex()));
 				this.input.setText("");
+				this.addTab(this.prejemnik.getText());
 			}
 		}
 	}

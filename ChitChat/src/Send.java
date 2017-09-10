@@ -14,7 +14,7 @@ public class Send {
 		          .addParameter("username", "Matija")
 		          .build();
 
-		  String message = "{\"global\" : false,\"recipient\": \"Anja\", \"text\" : \"Test test 123\"  }";
+		  String message = "{\"global\" : false,\"recipient\": \"Matija2\", \"text\" : \"Test test 123\"  }";
 
 		  String responseBody = Request.Post(uri)
 		          .bodyString(message, ContentType.APPLICATION_JSON)

@@ -10,7 +10,7 @@ public class Receive {
 
 	public static void main(String[] args) throws ClientProtocolException, IOException, URISyntaxException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
-		          .addParameter("username", "Matija")
+		          .addParameter("username", "Matija2")
 		          .build();
 
 		  String responseBody = Request.Get(uri)
