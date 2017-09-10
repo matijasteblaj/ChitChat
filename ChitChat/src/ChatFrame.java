@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -135,7 +136,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	 * @param message - the message content
 	 */
 	public void addMessage(String person, String message) {
-		//Doda besedilo iz "input" v trenutno izbrani tab
+		//Sporocilo se izpise v trenutno izbran tab
 		JTextArea output = this.tabTextSlovar.get(this.tabbedPane.getTitleAt(
 				this.tabbedPane.getSelectedIndex()));
 		String chat = output.getText();
@@ -158,8 +159,6 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			this.tabbedPane.add(prejemnik, scrollPane);
 			this.tabTextSlovar.put(prejemnik, textArea);
 		}
-		System.out.println(prejemnik);
-		System.out.println(tabbedPane.getTabCount());
 		this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
 	}
 	
@@ -187,20 +186,33 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			e.printStackTrace();
 		}
 	}
+	public boolean jePrijavljen(String oseba) throws ClientProtocolException, IOException{
+		String[] seznamOnline = extractUsername(Get.get());
+		return Arrays.asList(seznamOnline).contains(this.vzdevekInput.getText());
+	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
 		if (action.equals("Prijava")){
 			try {
-				this.addMessage("Server", Post.post(vzdevekInput.getText()));
+				if (!this.jePrijavljen(this.vzdevekInput.getText())){
+					Post.post(vzdevekInput.getText());
+					this.addMessage("Server", "Uporabnik uspesno prijavljen");
+				} else {
+					this.addMessage("Server", "Uporabnik s tem vzdevkom je ze prijavljen");
+				}
 			} catch (URISyntaxException | IOException e1) {
 				e1.printStackTrace();
 			}
 		} else if(action.equals("Odjava")){
 			try {
-				this.addMessage("Server", Delete.delete(vzdevekInput.getText()));
-				this.vzdevekInput.setEditable(true);
+				if (this.jePrijavljen(this.vzdevekInput.getText())){
+					Delete.delete(vzdevekInput.getText());
+					this.addMessage("Server", "Uporabnik uspesno odjavljen" );
+				} else {
+					this.addMessage("Server", "Ni prijavljenih uporabnikov s tem vzdevkom");
+				}
 			} catch (URISyntaxException | IOException e1) {
 				e1.printStackTrace();
 			}
@@ -212,8 +224,19 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
 				this.addTab(this.prejemnik.getText());
-				this.addMessage(this.vzdevekInput.getText(), this.input.getText());
-				this.input.setText("");
+				try {
+					if (this.jePrijavljen(this.vzdevekInput.getText())){
+						Send.send(this.vzdevekInput.getText(), this.prejemnik.getText(), this.input.getText());
+						this.addMessage(this.vzdevekInput.getText(), this.input.getText());
+						this.input.setText("");
+					}
+				} catch (ClientProtocolException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}

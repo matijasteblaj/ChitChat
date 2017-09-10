@@ -9,20 +9,26 @@ import org.apache.http.entity.ContentType;
 
 public class Send {
 
-	public static void main(String[] args) throws ClientProtocolException, IOException, URISyntaxException {
+	public static void send(String posiljatelj, String prejemnik, String message) throws ClientProtocolException, IOException, URISyntaxException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
-		          .addParameter("username", "Matija")
+		          .addParameter("username",posiljatelj)
 		          .build();
+		
+		String global = "";
+		if (prejemnik == "Vsi"){
+			global = "true";
+		} else {
+			global = "false";
+		}
+		
+		String text = "{\"global\" : \"" + global + "\", \"recipient\": \"" + prejemnik + "\", \"text\" : \"" + message + "\"  }";
 
-		  String message = "{\"global\" : false,\"recipient\": \"Matija2\", \"text\" : \"Test test 123\"  }";
-
-		  String responseBody = Request.Post(uri)
-		          .bodyString(message, ContentType.APPLICATION_JSON)
+		String responseBody = Request.Post(uri)
+		          .bodyString(text, ContentType.APPLICATION_JSON)
 		          .execute()
 		          .returnContent()
 		          .asString();
-
-		  System.out.println(responseBody);
+		System.out.println(responseBody);
 	}
 
 }

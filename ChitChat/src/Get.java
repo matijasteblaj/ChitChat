@@ -20,6 +20,6 @@ public class Get {
             String text = Request.Get("http://chitchat.andrej.com/users")
                                   .execute()
                                   .returnContent().asString();
-            return(text);
+            return text;
         }
     }

@@ -16,6 +16,6 @@ public class Delete {
 		                               .execute()
 		                               .returnContent()
 		                               .asString();
-		return(responseBody);
+		return responseBody;
 	}
 }

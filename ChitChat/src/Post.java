@@ -16,7 +16,6 @@ public class Post {
 		                               .execute()
 		                               .returnContent()
 		                               .asString();
-		//System.out.println(responseBody);
 		return responseBody;
 	}
 }

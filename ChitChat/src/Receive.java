@@ -20,5 +20,4 @@ public class Receive {
 
 		  System.out.println(responseBody);
 	}
-
 }
