@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +44,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JLabel inputLabel;
 	private JLabel prejemnikLabel;
 	private JTabbedPane tabbedPane;
+	private HashMap<String, JTextArea> tabSlovar;
+	
 	public ChatFrame() throws ClientProtocolException, URISyntaxException, IOException {
 		super();
 		setTitle("ChitChat");
@@ -100,6 +103,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Default", scrollPane);
 		pane.add(tabbedPane, outputConstraint);
+		this.tabSlovar = new HashMap<String, JTextArea>();
+		tabSlovar.put("Default", this.output);
 
 		this.inputPanel = new JPanel();
 		this.input = new JTextField(40);
@@ -130,7 +135,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	 * @param person - the person sending the message
 	 * @param message - the message content
 	 */
-	public void addMessage(String person, String message, JTextArea output) {
+	public void addMessage(String person, String message) {
+		//Doda besedilo iz "input" v trenutno izbrani tab
+		JTextArea output = this.tabSlovar.get(this.tabbedPane.getTitleAt(
+				this.tabbedPane.getSelectedIndex()));
 		String chat = output.getText();
 		output.setText(chat + person + ": " + message + "\n");
 	}
@@ -147,6 +155,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		JTextArea textArea = new JTextArea(20, 40);
 		textArea.setEditable(false);
 		this.tabbedPane.add(prejemnik, textArea);
+		this.tabSlovar.put(prejemnik, textArea);
 	}
 	
 	private String[] extractUsername(String string) {
@@ -179,31 +188,25 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		String action = e.getActionCommand();
 		if (action.equals("Prijava")){
 			try {
-				JTextArea output = this.tabbedPane.getSelectedComponent();
-				this.addMessage("Server", Post.post(vzdevekInput.getText()), this.tabbedPane.getcomponent());
+				this.addMessage("Server", Post.post(vzdevekInput.getText()));
 			} catch (URISyntaxException | IOException e1) {
 				e1.printStackTrace();
 			}
 		} else if(action.equals("Odjava")){
 			try {
-				this.addMessage("Server", Delete.delete(vzdevekInput.getText()), this.tabbedPane.getComponentAt(
-						this.tabbedPane.getSelectedIndex()));
+				this.addMessage("Server", Delete.delete(vzdevekInput.getText()));
 				this.vzdevekInput.setEditable(true);
 			} catch (URISyntaxException | IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		} else if(action.equals("Osvezi")){
-			osvezi();
-		}
+		} 
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
-				this.addMessage(this.vzdevekInput.getText(), this.input.getText(), this.tabbedPane.getComponentAt(
-						this.tabbedPane.getSelectedIndex()));
+				this.addMessage(this.vzdevekInput.getText(), this.input.getText());
 				this.input.setText("");
 				this.addTab(this.prejemnik.getText());
 			}

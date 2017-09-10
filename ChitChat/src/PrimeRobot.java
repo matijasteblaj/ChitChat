@@ -1,6 +1,8 @@
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.JTextArea;
+
 public class PrimeRobot extends TimerTask {
 	private ChatFrame chat;
 	private int k;
