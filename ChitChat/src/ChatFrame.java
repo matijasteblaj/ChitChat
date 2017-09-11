@@ -10,13 +10,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -45,6 +40,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JLabel prejemnikLabel;
 	JTabbedPane tabbedPane;
 	HashMap<String, JTextArea> tabTextAreaSlovar;
+	private String[] seznamOnline;
 	
 	public ChatFrame() throws ClientProtocolException, URISyntaxException, IOException {
 		super();
@@ -143,8 +139,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	public void refreshOnline(String[] seznamOnline){
+		this.seznamOnline = seznamOnline;
 		String text = "";
-		for (String oseba : seznamOnline){
+		for (String oseba : this.seznamOnline){
 			text = text + oseba + "\n";
 		}
 		this.onlineOutput.setText(text);
@@ -160,34 +157,14 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		}
 		this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
 	}
+
 	
-	private String[] extractUsername(String string) {
-		List<String> seznam = new ArrayList<String>();
-		String pattern = "username\":\"(?<username>.*?)\"";
-		Pattern r = Pattern.compile(pattern);
-		Matcher m = r.matcher(string);
-		while (m.find()){
-			seznam.add(m.group("username"));
-		}
-		String[] navadenSeznam = new String[seznam.size()];
-		seznam.toArray(navadenSeznam);
-		return navadenSeznam;
-	}
-	
-	public void osvezi(){
-		String[] seznamOnline;
-		try {
-			seznamOnline = extractUsername(Get.get());
+	public void osvezi(String[] seznamOnline){
 			refreshOnline(seznamOnline);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
+	
 	public boolean jePrijavljen(String oseba) throws ClientProtocolException, IOException{
-		String[] seznamOnline = extractUsername(Get.get());
-		return Arrays.asList(seznamOnline).contains(this.vzdevekInput.getText());
+		return Arrays.asList(this.seznamOnline).contains(this.vzdevekInput.getText());
 	}
 	
 	@Override
