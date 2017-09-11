@@ -39,7 +39,6 @@ public class Checker extends TimerTask{
 		try {
 			seznamOnline = extractUsername(Get.get());
 			chat.osvezi(seznamOnline);
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

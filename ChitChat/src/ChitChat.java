@@ -16,6 +16,16 @@ public class ChitChat {
 		checker.activate();
 		chatFrame.pack();
 		chatFrame.setVisible(true);
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		    public void run() {
+		        try {
+					chatFrame.odjavi();
+				} catch (URISyntaxException | IOException e) {
+					e.printStackTrace();
+				}
+		    }
+		});
+
 	}
 
 }

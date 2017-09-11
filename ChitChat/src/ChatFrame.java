@@ -157,6 +157,25 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		}
 		this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
 	}
+	
+	public boolean prijavi() throws ClientProtocolException, URISyntaxException, IOException{
+		if (!this.jePrijavljen(this.vzdevekInput.getText())){
+			Post.post(vzdevekInput.getText());
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+	
+	public boolean odjavi() throws ClientProtocolException, URISyntaxException, IOException{
+		if (this.jePrijavljen(this.vzdevekInput.getText())){
+			Delete.delete(vzdevekInput.getText());
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	
 	public void osvezi(String[] seznamOnline){
@@ -172,24 +191,26 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		String action = e.getActionCommand();
 		if (action.equals("Prijava")){
 			try {
-				if (!this.jePrijavljen(this.vzdevekInput.getText())){
-					Post.post(vzdevekInput.getText());
+				if (this.prijavi()){
+					this.prijava.setEnabled(false);
+					this.vzdevekInput.setEditable(false);
 					this.addMessage("Server", "Uporabnik uspesno prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
-				} else {
-					this.addMessage("Server", "Uporabnik s tem vzdevkom je ze prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+				} else if (!this.prijavi()) {
+					this.addMessage("Server", "Prijava neuspesna, morda je ta uporabnik ze prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				}
-			} catch (URISyntaxException | IOException e1) {
+			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}
 		} else if(action.equals("Odjava")){
 			try {
-				if (this.jePrijavljen(this.vzdevekInput.getText())){
-					Delete.delete(vzdevekInput.getText());
+				if (this.odjavi()){
+					this.prijava.setEnabled(true);
+					this.vzdevekInput.setEditable(true);
 					this.addMessage("Server", "Uporabnik uspesno odjavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())) );
-				} else {
-					this.addMessage("Server", "Ni prijavljenih uporabnikov s tem vzdevkom", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+				} else if (!this.odjavi()) {
+					this.addMessage("Server", "Odjava neuspesna, morda ta uporabnik ni prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				}
-			} catch (URISyntaxException | IOException e1) {
+			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}
 		} 
