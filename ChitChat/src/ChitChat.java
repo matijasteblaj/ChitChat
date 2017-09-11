@@ -12,8 +12,8 @@ public class ChitChat {
 		chatFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		PrimeRobot robot = new PrimeRobot(chatFrame);
 		robot.activate();
-		OnlineChecker onlineChecker = new OnlineChecker(chatFrame);
-		onlineChecker.activate();
+		Checker checker = new Checker(chatFrame);
+		checker.activate();
 		chatFrame.pack();
 		chatFrame.setVisible(true);
 	}

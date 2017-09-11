@@ -31,7 +31,7 @@ import org.apache.http.client.ClientProtocolException;
 @SuppressWarnings("serial")
 public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
-	private JTextArea output;
+	JTextArea output;
 	private JTextField input;
 	private JPanel vzdevek;
 	private JTextField vzdevekInput;
@@ -43,8 +43,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JTextField prejemnik;
 	private JLabel inputLabel;
 	private JLabel prejemnikLabel;
-	private JTabbedPane tabbedPane;
-	private HashMap<String, JTextArea> tabTextSlovar;
+	JTabbedPane tabbedPane;
+	HashMap<String, JTextArea> tabTextAreaSlovar;
 	
 	public ChatFrame() throws ClientProtocolException, URISyntaxException, IOException {
 		super();
@@ -54,7 +54,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 		
 		this.vzdevek = new JPanel();
-		JLabel napis = new JLabel("Vzdevek");
+		JLabel napis = new JLabel("Vzdevek:");
 		this.vzdevekInput = new JTextField(System.getProperty("user.name"), 40);
 		FlowLayout vzdevekFlow = new FlowLayout();
 		vzdevek.setLayout(vzdevekFlow);
@@ -101,9 +101,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 		JScrollPane scrollPane = new JScrollPane(output);
 		this.tabbedPane = new JTabbedPane();
-		this.tabTextSlovar = new HashMap<String, JTextArea>();
+		this.tabTextAreaSlovar = new HashMap<String, JTextArea>();
 		tabbedPane.add("Vsi", scrollPane);
-		tabTextSlovar.put("Vsi", output);
+		tabTextAreaSlovar.put("Vsi", output);
 		pane.add(tabbedPane, outputConstraint);
 
 		this.inputPanel = new JPanel();
@@ -134,11 +134,10 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	/**
 	 * @param person - the person sending the message
 	 * @param message - the message content
+	 * @param output - the JTextArea to which the message will be added
 	 */
-	public void addMessage(String person, String message) {
+	public void addMessage(String person, String message, JTextArea output) {
 		//Sporocilo se izpise v trenutno izbran tab
-		JTextArea output = this.tabTextSlovar.get(this.tabbedPane.getTitleAt(
-				this.tabbedPane.getSelectedIndex()));
 		String chat = output.getText();
 		output.setText(chat + person + ": " + message + "\n");
 	}
@@ -152,12 +151,12 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	private void addTab(String prejemnik){
-		if (!this.tabTextSlovar.containsKey(prejemnik)){
+		if (!this.tabTextAreaSlovar.containsKey(prejemnik)){
 			JTextArea textArea = new JTextArea(20, 40);
 			textArea.setEditable(false);
 			JScrollPane scrollPane = new JScrollPane(textArea);
 			this.tabbedPane.add(prejemnik, scrollPane);
-			this.tabTextSlovar.put(prejemnik, textArea);
+			this.tabTextAreaSlovar.put(prejemnik, textArea);
 		}
 		this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
 	}
@@ -198,9 +197,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			try {
 				if (!this.jePrijavljen(this.vzdevekInput.getText())){
 					Post.post(vzdevekInput.getText());
-					this.addMessage("Server", "Uporabnik uspesno prijavljen");
+					this.addMessage("Server", "Uporabnik uspesno prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else {
-					this.addMessage("Server", "Uporabnik s tem vzdevkom je ze prijavljen");
+					this.addMessage("Server", "Uporabnik s tem vzdevkom je ze prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				}
 			} catch (URISyntaxException | IOException e1) {
 				e1.printStackTrace();
@@ -209,9 +208,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			try {
 				if (this.jePrijavljen(this.vzdevekInput.getText())){
 					Delete.delete(vzdevekInput.getText());
-					this.addMessage("Server", "Uporabnik uspesno odjavljen" );
+					this.addMessage("Server", "Uporabnik uspesno odjavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())) );
 				} else {
-					this.addMessage("Server", "Ni prijavljenih uporabnikov s tem vzdevkom");
+					this.addMessage("Server", "Ni prijavljenih uporabnikov s tem vzdevkom", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				}
 			} catch (URISyntaxException | IOException e1) {
 				e1.printStackTrace();
@@ -223,19 +222,23 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void keyTyped(KeyEvent e) {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
-				this.addTab(this.prejemnik.getText());
-				try {
-					if (this.jePrijavljen(this.vzdevekInput.getText())){
-						Send.send(this.vzdevekInput.getText(), this.prejemnik.getText(), this.input.getText());
-						this.addMessage(this.vzdevekInput.getText(), this.input.getText());
-						this.input.setText("");
+				if (this.prejemnik.getText().length() == 0){
+					this.addMessage("Server", "Vnesite vzdevek prejemnika", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+				} else {
+					this.addTab(this.prejemnik.getText());
+					try {
+						if (this.jePrijavljen(this.vzdevekInput.getText())){
+							Send.send(this.vzdevekInput.getText(), this.prejemnik.getText(), this.input.getText());
+							this.addMessage(this.vzdevekInput.getText(), this.input.getText(), this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+							this.input.setText("");
+						}
+					} catch (ClientProtocolException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (URISyntaxException e1) {
+						e1.printStackTrace();
 					}
-				} catch (ClientProtocolException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (URISyntaxException e1) {
-					e1.printStackTrace();
 				}
 			}
 		}

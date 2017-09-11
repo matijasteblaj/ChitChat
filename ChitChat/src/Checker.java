@@ -3,10 +3,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.apache.http.client.ClientProtocolException;
 
-public class OnlineChecker extends TimerTask{
+public class Checker extends TimerTask{
 	private ChatFrame chat;
 	
-	public OnlineChecker(ChatFrame chat) throws ClientProtocolException, IOException{
+	public Checker(ChatFrame chat) throws ClientProtocolException, IOException{
 		this.chat = chat;
 	}
 

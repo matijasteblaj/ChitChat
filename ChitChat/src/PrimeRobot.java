@@ -28,7 +28,8 @@ public class PrimeRobot extends TimerTask {
 	@Override
 	public void run() {
 		if (isPrime(this.k)) {
-			chat.addMessage("primer", Integer.toString(this.k) + " is prime");
+			chat.addMessage("primer", Integer.toString(this.k) + " is prime",
+					chat.tabTextAreaSlovar.get("Vsi"));
 		}
 		this.k++;
 	}

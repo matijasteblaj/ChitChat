@@ -11,7 +11,7 @@ public class Send {
 
 	public static void send(String posiljatelj, String prejemnik, String message) throws ClientProtocolException, IOException, URISyntaxException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
-		          .addParameter("username",posiljatelj)
+		          .addParameter("username", posiljatelj)
 		          .build();
 		
 		String global = "";
