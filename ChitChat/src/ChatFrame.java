@@ -192,8 +192,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		if (action.equals("Prijava")){
 			try {
 				if (this.prijavi()){
-					this.prijava.setEnabled(false);
-					this.vzdevekInput.setEditable(false);
+					//this.prijava.setEnabled(false);
+					//this.vzdevekInput.setEditable(false);
 					this.addMessage("Server", "Uporabnik uspesno prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else if (!this.prijavi()) {
 					this.addMessage("Server", "Prijava neuspesna, morda je ta uporabnik ze prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
