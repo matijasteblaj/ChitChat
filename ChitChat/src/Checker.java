@@ -20,7 +20,7 @@ public class Checker extends TimerTask{
 		timer.scheduleAtFixedRate(this, 1000, 1000);
 	}
 	
-	private String[] extractUsername(String string) {
+	private String[] extractUsernames(String string) {
 		List<String> seznam = new ArrayList<String>();
 		String pattern = "username\":\"(?<username>.*?)\"";
 		Pattern r = Pattern.compile(pattern);
@@ -33,12 +33,30 @@ public class Checker extends TimerTask{
 		return navadenSeznam;
 	}
 	
+	private String[] extractMessages(String string){
+		List<String> seznam = new ArrayList<String>();
+		String pattern = "\"sender\":\"(?<posiljatelj>.*?)\",\"text\":\"(?<sporocilo>.*?)\"";
+		Pattern r = Pattern.compile(pattern);
+		Matcher m = r.matcher(string);
+		while(m.find()){
+			seznam.add(m.group("posiljatelj"));
+			seznam.add(m.group("sporocilo"));
+		}
+		String[] navadenSeznam = new String[seznam.size()];
+		seznam.toArray(navadenSeznam);
+		System.out.println(navadenSeznam);
+		return navadenSeznam;
+	}
+	
 	@Override
 	public void run(){
-		String[] seznamOnline;
 		try {
-			seznamOnline = extractUsername(Get.get());
-			chat.osvezi(seznamOnline);
+			/**if (chat.prijavljen){
+				String[] seznamSporocil = extractMessages(Receive.receive(chat.vzdevekInput.getText()));
+				chat.osveziSporocila
+			}*/
+			String[] seznamOnline = extractUsernames(Get.get());
+			chat.osveziOnline(seznamOnline);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

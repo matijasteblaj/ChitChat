@@ -20,4 +20,18 @@ public class Receive {
 
 		  System.out.println(responseBody);
 	}
+	
+	/**
+	public static String[] receive(String username) throws ClientProtocolException, IOException, URISyntaxException {
+		URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
+		          .addParameter("username", username)
+		          .build();
+
+		  String responseBody = Request.Get(uri)
+		          .execute()
+		          .returnContent()
+		          .asString();
+
+		  return responseBody;
+	}*/
 }

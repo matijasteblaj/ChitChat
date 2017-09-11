@@ -26,7 +26,7 @@ import org.apache.http.client.ClientProtocolException;
 @SuppressWarnings("serial")
 public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	
-	JTextArea output;
+	private JTextArea output;
 	private JTextField input;
 	private JPanel vzdevek;
 	private JTextField vzdevekInput;
@@ -41,6 +41,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	JTabbedPane tabbedPane;
 	HashMap<String, JTextArea> tabTextAreaSlovar;
 	private String[] seznamOnline;
+	boolean prijavljen;
 	
 	public ChatFrame() throws ClientProtocolException, URISyntaxException, IOException {
 		super();
@@ -69,6 +70,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		vzdevekConstraint.gridy = 0;
 		pane.add(vzdevek, vzdevekConstraint);
 		vzdevek.addKeyListener(this);
+		
 		
 		this.online = new JPanel();
 		JLabel napisOnline = new JLabel("Online:");
@@ -125,6 +127,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			}
 		});
 		
+		this.prijavljen = false;		
 	}
 
 	/**
@@ -133,18 +136,24 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	 * @param output - the JTextArea to which the message will be added
 	 */
 	public void addMessage(String person, String message, JTextArea output) {
-		//Sporocilo se izpise v trenutno izbran tab
 		String chat = output.getText();
 		output.setText(chat + person + ": " + message + "\n");
 	}
 	
-	public void refreshOnline(String[] seznamOnline){
+	public void osveziOnline(String[] seznamOnline){
 		this.seznamOnline = seznamOnline;
 		String text = "";
 		for (String oseba : this.seznamOnline){
 			text = text + oseba + "\n";
 		}
 		this.onlineOutput.setText(text);
+	}
+	
+	public void osveziSporocila(String[] seznamSporocil){
+		for (int i=0; i+2 < seznamSporocil.length; i += 2){
+			this.addTab(seznamSporocil[i]);
+			this.addMessage(seznamSporocil[i], seznamSporocil[i+1], this.tabTextAreaSlovar.get(seznamSporocil[i]));
+		}
 	}
 	
 	private void addTab(String prejemnik){
@@ -177,10 +186,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		}
 	}
 
-	
-	public void osvezi(String[] seznamOnline){
-			refreshOnline(seznamOnline);
-	}
+
 	
 	public boolean jePrijavljen(String oseba) throws ClientProtocolException, IOException{
 		return Arrays.asList(this.seznamOnline).contains(this.vzdevekInput.getText());
@@ -194,6 +200,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 				if (this.prijavi()){
 					//this.prijava.setEnabled(false);
 					//this.vzdevekInput.setEditable(false);
+					//this.prijavljen = true
 					this.addMessage("Server", "Uporabnik uspesno prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else if (!this.prijavi()) {
 					this.addMessage("Server", "Prijava neuspesna, morda je ta uporabnik ze prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
@@ -204,8 +211,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		} else if(action.equals("Odjava")){
 			try {
 				if (this.odjavi()){
-					this.prijava.setEnabled(true);
-					this.vzdevekInput.setEditable(true);
+					//this.prijava.setEnabled(true);
+					//this.vzdevekInput.setEditable(true);
+					//this.prijavljen = false;
 					this.addMessage("Server", "Uporabnik uspesno odjavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())) );
 				} else if (!this.odjavi()) {
 					this.addMessage("Server", "Odjava neuspesna, morda ta uporabnik ni prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
