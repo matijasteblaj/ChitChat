@@ -1,7 +1,10 @@
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,8 +13,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -124,6 +129,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		inputPanel.add(input);
 		pane.add(inputPanel, inputConstraint);
 		
+		
 		tabbedPane.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent e){
 				prejemnik.setText(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
@@ -172,6 +178,20 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			JScrollPane scrollPane = new JScrollPane(textArea);
 			this.tabbedPane.add(prejemnik, scrollPane);
 			this.tabTextAreaSlovar.put(prejemnik, textArea);
+			
+			JPanel panelTab = new JPanel();
+			JLabel tabTitle = new JLabel(prejemnik);
+			JButton closeButton = new JButton("x");
+			closeButton.setFont(new Font("Arial", Font.PLAIN, 10));
+			Dimension size = new Dimension(15, 15);
+			closeButton.setPreferredSize(size);
+			closeButton.setMargin(new Insets(0, 0, 0, 0));
+			panelTab.add(tabTitle);
+			panelTab.add(closeButton);
+			
+			this.tabbedPane.setTabComponentAt(this.tabbedPane.indexOfTab(prejemnik), panelTab);
+			closeButton.addActionListener(this);
+			closeButton.setActionCommand("Zbrisi " + prejemnik);
 		}
 		if (fokus){
 			this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
@@ -222,6 +242,16 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		} else if(action.equals("Odjava")){
 			try {
 				if (this.odjavi()){
+					ArrayList<String> seznamTabov = new ArrayList<String>();
+					for (String tab: this.tabTextAreaSlovar.keySet()){
+						if(!(tab == "Vsi")){
+							seznamTabov.add(tab);
+							this.tabbedPane.remove(this.tabbedPane.indexOfTab(tab));
+						}
+					}
+					for (String tab: seznamTabov){
+						this.tabTextAreaSlovar.remove(tab);
+					}
 					this.prijava.setEnabled(true);
 					this.vzdevekInput.setEditable(true);
 					this.prijavljen = false;
@@ -232,7 +262,12 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}
-		} 
+		}  else if(action.contains("Zbrisi")){
+			String prejemnik = action.split(" ")[1];
+			this.tabbedPane.remove(this.tabbedPane.indexOfTab(prejemnik));
+			this.tabTextAreaSlovar.remove(prejemnik);
+		}
+			
 	}
 
 	@Override
@@ -241,6 +276,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			if (e.getKeyChar() == '\n') {
 				if (this.prejemnik.getText().length() == 0){
 					this.addMessage("Server", "Vnesite vzdevek prejemnika", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+				} else if (this.input.getText().length() == 0){
+					;
 				} else {
 					try {
 						if (this.jePrijavljen(this.vzdevekInput.getText())){
