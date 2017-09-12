@@ -81,16 +81,17 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 		this.online = new JPanel();
 		JLabel napisOnline = new JLabel("Online:");
+		GridBagConstraints napisOnlineConstraint = new GridBagConstraints();
 		this.onlineOutput = new JTextArea(30,12);
 		this.onlineOutput.setEditable(false);
-		FlowLayout onlineFlow = new FlowLayout();
-		online.setLayout(onlineFlow);
-		online.add(napisOnline);
-		online.add(onlineOutput);
+		JScrollPane onlineOutputScrollPane = new JScrollPane(onlineOutput);
+		GridBagConstraints onlineOutputConstraint = new GridBagConstraints();
+		online.add(napisOnline, napisOnlineConstraint);
+		online.add(onlineOutputScrollPane, onlineOutputConstraint);
 		GridBagConstraints onlineConstraint = new GridBagConstraints();
 		onlineConstraint.gridx = 1;
-		onlineConstraint.gridy = 0;
-		onlineConstraint.gridheight = 2;
+		onlineConstraint.gridy = 1;
+		onlineConstraint.fill = GridBagConstraints.HORIZONTAL;
 		pane.add(online, onlineConstraint);
 		online.addKeyListener(this);
 		
@@ -232,9 +233,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 					this.prijava.setEnabled(false);
 					this.vzdevekInput.setEditable(false);
 					this.prijavljen = true;
-					this.addMessage("Server", "Uporabnik uspesno prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+					this.addMessage("Server", "Uporabnik uspesno prijavljen",
+							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else if (!this.prijavi()) {
-					this.addMessage("Server", "Prijava neuspesna, morda je ta uporabnik ze prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+					this.addMessage("Server", "Prijava neuspesna, morda je ta uporabnik ze prijavljen?",
+							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				}
 			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
@@ -255,9 +258,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 					this.prijava.setEnabled(true);
 					this.vzdevekInput.setEditable(true);
 					this.prijavljen = false;
-					this.addMessage("Server", "Uporabnik uspesno odjavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())) );
+					this.addMessage("Server", "Uporabnik uspesno odjavljen",
+							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else if (!this.odjavi()) {
-					this.addMessage("Server", "Odjava neuspesna, morda ta uporabnik ni prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+					this.addMessage("Server", "Odjava neuspesna, morda ta uporabnik ni prijavljen?",
+							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				}
 			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
@@ -275,7 +280,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
 				if (this.prejemnik.getText().length() == 0){
-					this.addMessage("Server", "Vnesite vzdevek prejemnika", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+					this.addMessage("Server", "Vnesite vzdevek prejemnika",
+							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else if (this.input.getText().length() == 0){
 					;
 				} else {
@@ -283,8 +289,12 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 						if (this.jePrijavljen(this.vzdevekInput.getText())){
 							this.addTab(this.prejemnik.getText(), true);
 							Send.send(this.vzdevekInput.getText(), this.prejemnik.getText(), this.input.getText());
-							this.addMessage(this.vzdevekInput.getText(), this.input.getText(), this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+							this.addMessage(this.vzdevekInput.getText(), this.input.getText(),
+									this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 							this.input.setText("");
+						} else {
+							this.addMessage("Server", "Za posiljanje sporocil morate biti prijavljeni",
+									this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 						}
 					} catch (IOException | URISyntaxException e1) {
 						e1.printStackTrace();

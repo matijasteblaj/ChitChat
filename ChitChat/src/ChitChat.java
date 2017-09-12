@@ -15,7 +15,9 @@ public class ChitChat {
 		Checker checker = new Checker(chatFrame);
 		checker.activate();
 		chatFrame.pack();
+		chatFrame.setMinimumSize(chatFrame.getSize());
 		chatFrame.setVisible(true);
+		chatFrame.getSize();
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 		    public void run() {
 		        try {
