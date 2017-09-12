@@ -36,10 +36,11 @@ public class Checker extends TimerTask{
 	
 	private String[] extractMessages(String string){
 		List<String> seznam = new ArrayList<String>();
-		String pattern = "\"sender\":\"(?<posiljatelj>.*?)\",\"text\":\"(?<sporocilo>.*?)\"";
+		String pattern = "\"global\":(?<global>.*?),.*?\"sender\":\"(?<posiljatelj>.*?)\",\"text\":\"(?<sporocilo>.*?)\"";
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(string);
 		while(m.find()){
+			seznam.add(m.group("global"));
 			seznam.add(m.group("posiljatelj"));
 			seznam.add(m.group("sporocilo"));
 		}

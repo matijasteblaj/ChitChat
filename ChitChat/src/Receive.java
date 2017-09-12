@@ -17,7 +17,6 @@ public class Receive {
 		          .execute()
 		          .returnContent()
 		          .asString();
-
 		  return responseBody;
 	}
 }
