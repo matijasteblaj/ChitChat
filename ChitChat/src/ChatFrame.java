@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -108,9 +109,8 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		JScrollPane scrollPane = new JScrollPane(output);
 		this.tabbedPane = new JTabbedPane();
 		this.tabTextAreaSlovar = new HashMap<String, JTextArea>();
-		tabbedPane.add("Vsi", scrollPane);
-		tabTextAreaSlovar.put("Vsi", output);
-
+		tabbedPane.add("Server", scrollPane);
+		tabTextAreaSlovar.put("Server", output);
 		pane.add(tabbedPane, outputConstraint);
 
 		this.inputPanel = new JPanel();
@@ -123,7 +123,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		inputConstraint.fill = GridBagConstraints.HORIZONTAL;
 		inputConstraint.weightx = 1.0;
 		input.addKeyListener(this);
-		this.prejemnik = new JTextField("Vsi", 20);
+		this.prejemnik = new JTextField("Server", 20);
 		inputPanel.add(prejemnikLabel);
 		inputPanel.add(prejemnik);
 		inputPanel.add(inputLabel);
@@ -134,6 +134,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		tabbedPane.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent e){
 				prejemnik.setText(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
+				tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), new Color(184, 207, 229));
 			}
 		});
 		
@@ -152,8 +153,21 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	 * @param output - the JTextArea to which the message will be added
 	 */
 	public void addMessage(String person, String message, JTextArea output) {
+		if (this.tabTextAreaSlovar.keySet().size() == 0){
+			this.addTab("Vsi", true);
+		}
 		String chat = output.getText();
 		output.setText(chat + person + ": " + message + "\n");
+		String key = "";
+		for (String kljuc : this.tabTextAreaSlovar.keySet()){
+			if (this.tabTextAreaSlovar.get(kljuc) == output){
+				key = kljuc;
+			}
+		}
+		int index = this.tabbedPane.indexOfTab(key);
+		if (!(this.tabbedPane.getSelectedIndex() == index)){
+			this.tabbedPane.setBackgroundAt(index, new Color(255, 204, 135));
+		}
 	}
 	
 	public void osveziOnline(String[] seznamOnline){
@@ -240,11 +254,13 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 					this.prijava.setEnabled(false);
 					this.vzdevekInput.setEditable(false);
 					this.prijavljen = true;
-					this.addMessage("Server", "Uporabnik uspesno prijavljen",
-							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+					if (this.tabTextAreaSlovar.keySet().size() == 0){
+						this.addTab("Vsi", true);
+					}
+					this.addMessage("Server", "Uporabnik uspesno prijavljen", this.tabTextAreaSlovar.get("Server"));
 				} else if (!this.prijavi()) {
 					this.addMessage("Server", "Prijava neuspesna, morda je ta uporabnik ze prijavljen?",
-							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+							this.tabTextAreaSlovar.get("Server"));
 				}
 			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
@@ -254,7 +270,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 				if (this.odjavi()){
 					ArrayList<String> seznamTabov = new ArrayList<String>();
 					for (String tab: this.tabTextAreaSlovar.keySet()){
-						if(!(tab == "Vsi")){
+						if(!(tab == "Server")){
 							seznamTabov.add(tab);
 							this.tabbedPane.remove(this.tabbedPane.indexOfTab(tab));
 						}
@@ -265,19 +281,25 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 					this.prijava.setEnabled(true);
 					this.vzdevekInput.setEditable(true);
 					this.prijavljen = false;
-					this.addMessage("Server", "Uporabnik uspesno odjavljen",
-							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+					if (this.tabTextAreaSlovar.keySet().size() == 0){
+						this.addTab("Vsi", true);
+					}
+					this.addMessage("Server", "Uporabnik uspesno odjavljen",this.tabTextAreaSlovar.get("Server"));
 				} else if (!this.odjavi()) {
+					if (this.tabTextAreaSlovar.keySet().size() == 0){
+						this.addTab("Vsi", true);
+					}
 					this.addMessage("Server", "Odjava neuspesna, morda ta uporabnik ni prijavljen?",
-							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+							this.tabTextAreaSlovar.get("Server"));
 				}
 			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}
 		}  else if(action.contains("Zbrisi")){
 			String prejemnik = action.split(" ")[1];
-			this.tabbedPane.remove(this.tabbedPane.indexOfTab(prejemnik));
 			this.tabTextAreaSlovar.remove(prejemnik);
+			this.tabbedPane.remove(this.tabbedPane.indexOfTab(prejemnik));
+			
 		}
 			
 	}
@@ -287,8 +309,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		if (e.getSource() == this.input) {
 			if (e.getKeyChar() == '\n') {
 				if (this.prejemnik.getText().length() == 0){
-					this.addMessage("Server", "Vnesite vzdevek prejemnika",
-							this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+					this.addMessage("Server", "Vnesite vzdevek prejemnika",this.tabTextAreaSlovar.get("Server"));
+				} else if (this.prejemnik.getText() == "Server"){
+					this.addMessage(this.vzdevekInput.getText(), this.input.getText(), this.tabTextAreaSlovar.get("Server"));
 				} else if (this.input.getText().length() == 0){
 					;
 				} else {
@@ -300,8 +323,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 									this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 							this.input.setText("");
 						} else {
+							if (this.tabTextAreaSlovar.keySet().size() == 0){
+								this.addTab("Vsi", true);
+							}
 							this.addMessage("Server", "Za posiljanje sporocil morate biti prijavljeni",
-									this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
+									this.tabTextAreaSlovar.get("Server"));
 						}
 					} catch (IOException | URISyntaxException e1) {
 						e1.printStackTrace();
@@ -313,13 +339,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
+		;
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
+		;
 	}
 }
