@@ -18,7 +18,7 @@ public class Checker extends TimerTask{
 
 	public void activate(){
 		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(this, 1000, 1000);
+		timer.scheduleAtFixedRate(this, 0, 1000);
 	}
 	
 	private String[] extractUsernames(String string) {
@@ -57,8 +57,7 @@ public class Checker extends TimerTask{
 				String[] seznamSporocil = extractMessages(Receive.receive(prejemnik));
 				chat.osveziSporocila(seznamSporocil);
 			}
-			String[] seznamOnline = extractUsernames(Get.get());
-			chat.osveziOnline(seznamOnline);
+			chat.osveziOnline(extractUsernames(Get.get()));
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}

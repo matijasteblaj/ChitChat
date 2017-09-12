@@ -168,14 +168,12 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	public void osveziSporocila(String[] seznamSporocil){
 		for (int i=0; i < seznamSporocil.length; i += 3){
 			if (seznamSporocil[i].equals("true")){
-				System.out.println("True");
 				this.addMessage(seznamSporocil[i+1], seznamSporocil[i+2], this.tabTextAreaSlovar.get("Vsi"));
 			} else if(seznamSporocil[i].equals("false")) {
-				System.out.println("False");
-				this.addTab(seznamSporocil[i], false);
-				this.addMessage(seznamSporocil[i+1], seznamSporocil[i+2], this.tabTextAreaSlovar.get(seznamSporocil[i]));
+				this.addTab(seznamSporocil[i+1], false);
+				this.addMessage(seznamSporocil[i+1], seznamSporocil[i+2], this.tabTextAreaSlovar.get(seznamSporocil[i+1]));
 			} else {
-				System.out.println("Nekaj cudnega se dogaja");
+				System.out.println("Nekaj cudnega se je zgodilo");
 			}
 
 		}
