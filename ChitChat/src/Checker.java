@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -38,26 +39,30 @@ public class Checker extends TimerTask{
 		String pattern = "\"sender\":\"(?<posiljatelj>.*?)\",\"text\":\"(?<sporocilo>.*?)\"";
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(string);
+		System.out.println("Iscem");
 		while(m.find()){
+			System.out.println("Najdu");
+			System.out.println(m.group("posiljatelj"));
 			seznam.add(m.group("posiljatelj"));
+			System.out.println(m.group("sporocilo"));
 			seznam.add(m.group("sporocilo"));
 		}
 		String[] navadenSeznam = new String[seznam.size()];
 		seznam.toArray(navadenSeznam);
-		System.out.println(navadenSeznam);
 		return navadenSeznam;
 	}
 	
 	@Override
 	public void run(){
 		try {
-			/**if (chat.prijavljen){
-				String[] seznamSporocil = extractMessages(Receive.receive(chat.vzdevekInput.getText()));
-				chat.osveziSporocila
-			}*/
+			if (chat.prijavljen){
+				String prejemnik = chat.vzdevekInput.getText();
+				String[] seznamSporocil = extractMessages(Receive.receive(prejemnik));
+				chat.osveziSporocila(seznamSporocil);
+			}
 			String[] seznamOnline = extractUsernames(Get.get());
 			chat.osveziOnline(seznamOnline);
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 

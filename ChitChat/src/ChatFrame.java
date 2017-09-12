@@ -20,6 +20,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -29,7 +31,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	private JTextArea output;
 	private JTextField input;
 	private JPanel vzdevek;
-	private JTextField vzdevekInput;
+	JTextField vzdevekInput;
 	private JPanel online;
 	private JTextArea onlineOutput;
 	private JButton prijava;
@@ -102,6 +104,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.tabTextAreaSlovar = new HashMap<String, JTextArea>();
 		tabbedPane.add("Vsi", scrollPane);
 		tabTextAreaSlovar.put("Vsi", output);
+
 		pane.add(tabbedPane, outputConstraint);
 
 		this.inputPanel = new JPanel();
@@ -120,6 +123,12 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		inputPanel.add(inputLabel);
 		inputPanel.add(input);
 		pane.add(inputPanel, inputConstraint);
+		
+		tabbedPane.addChangeListener(new ChangeListener(){
+			public void stateChanged(ChangeEvent e){
+				prejemnik.setText(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
+			}
+		});
 		
 		addWindowListener(new WindowAdapter(){
 			public void windowOpened(WindowEvent e) {
@@ -150,13 +159,16 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	public void osveziSporocila(String[] seznamSporocil){
-		for (int i=0; i+2 < seznamSporocil.length; i += 2){
-			this.addTab(seznamSporocil[i]);
+		System.out.println("Smo v osveziSporocila");
+		System.out.println(seznamSporocil.length);
+		for (int i=0; i < seznamSporocil.length; i += 2){
+			System.out.println("Smo v zanki");
+			this.addTab(seznamSporocil[i], false);
 			this.addMessage(seznamSporocil[i], seznamSporocil[i+1], this.tabTextAreaSlovar.get(seznamSporocil[i]));
 		}
 	}
 	
-	private void addTab(String prejemnik){
+	private void addTab(String prejemnik, boolean fokus){
 		if (!this.tabTextAreaSlovar.containsKey(prejemnik)){
 			JTextArea textArea = new JTextArea(20, 40);
 			textArea.setEditable(false);
@@ -164,7 +176,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			this.tabbedPane.add(prejemnik, scrollPane);
 			this.tabTextAreaSlovar.put(prejemnik, textArea);
 		}
-		this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
+		if (fokus){
+			this.tabbedPane.setSelectedIndex(this.tabbedPane.indexOfTab(prejemnik));
+		}
 	}
 	
 	public boolean prijavi() throws ClientProtocolException, URISyntaxException, IOException{
@@ -198,9 +212,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		if (action.equals("Prijava")){
 			try {
 				if (this.prijavi()){
-					//this.prijava.setEnabled(false);
-					//this.vzdevekInput.setEditable(false);
-					//this.prijavljen = true
+					this.prijava.setEnabled(false);
+					this.vzdevekInput.setEditable(false);
+					this.prijavljen = true;
 					this.addMessage("Server", "Uporabnik uspesno prijavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else if (!this.prijavi()) {
 					this.addMessage("Server", "Prijava neuspesna, morda je ta uporabnik ze prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
@@ -211,9 +225,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		} else if(action.equals("Odjava")){
 			try {
 				if (this.odjavi()){
-					//this.prijava.setEnabled(true);
-					//this.vzdevekInput.setEditable(true);
-					//this.prijavljen = false;
+					this.prijava.setEnabled(true);
+					this.vzdevekInput.setEditable(true);
+					this.prijavljen = false;
 					this.addMessage("Server", "Uporabnik uspesno odjavljen", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())) );
 				} else if (!this.odjavi()) {
 					this.addMessage("Server", "Odjava neuspesna, morda ta uporabnik ni prijavljen?", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
@@ -231,9 +245,9 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 				if (this.prejemnik.getText().length() == 0){
 					this.addMessage("Server", "Vnesite vzdevek prejemnika", this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 				} else {
-					this.addTab(this.prejemnik.getText());
 					try {
 						if (this.jePrijavljen(this.vzdevekInput.getText())){
+							this.addTab(this.prejemnik.getText(), true);
 							Send.send(this.vzdevekInput.getText(), this.prejemnik.getText(), this.input.getText());
 							this.addMessage(this.vzdevekInput.getText(), this.input.getText(), this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 							this.input.setText("");

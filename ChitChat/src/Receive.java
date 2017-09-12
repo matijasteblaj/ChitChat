@@ -8,7 +8,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class Receive {
 
-	public static void main(String[] args) throws ClientProtocolException, IOException, URISyntaxException {
+	/**public static void main(String[] args) throws ClientProtocolException, IOException, URISyntaxException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
 		          .addParameter("username", "Matija2")
 		          .build();
@@ -19,10 +19,10 @@ public class Receive {
 		          .asString();
 
 		  System.out.println(responseBody);
-	}
+	}*/
 	
-	/**
-	public static String[] receive(String username) throws ClientProtocolException, IOException, URISyntaxException {
+
+	public static String receive(String username) throws ClientProtocolException, IOException, URISyntaxException {
 		URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
 		          .addParameter("username", username)
 		          .build();
@@ -33,5 +33,5 @@ public class Receive {
 		          .asString();
 
 		  return responseBody;
-	}*/
+	}
 }
