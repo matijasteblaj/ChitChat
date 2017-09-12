@@ -39,12 +39,8 @@ public class Checker extends TimerTask{
 		String pattern = "\"sender\":\"(?<posiljatelj>.*?)\",\"text\":\"(?<sporocilo>.*?)\"";
 		Pattern r = Pattern.compile(pattern);
 		Matcher m = r.matcher(string);
-		System.out.println("Iscem");
 		while(m.find()){
-			System.out.println("Najdu");
-			System.out.println(m.group("posiljatelj"));
 			seznam.add(m.group("posiljatelj"));
-			System.out.println(m.group("sporocilo"));
 			seznam.add(m.group("sporocilo"));
 		}
 		String[] navadenSeznam = new String[seznam.size()];

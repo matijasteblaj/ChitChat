@@ -159,10 +159,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	}
 	
 	public void osveziSporocila(String[] seznamSporocil){
-		System.out.println("Smo v osveziSporocila");
-		System.out.println(seznamSporocil.length);
 		for (int i=0; i < seznamSporocil.length; i += 2){
-			System.out.println("Smo v zanki");
 			this.addTab(seznamSporocil[i], false);
 			this.addMessage(seznamSporocil[i], seznamSporocil[i+1], this.tabTextAreaSlovar.get(seznamSporocil[i]));
 		}
@@ -252,11 +249,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 							this.addMessage(this.vzdevekInput.getText(), this.input.getText(), this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 							this.input.setText("");
 						}
-					} catch (ClientProtocolException e1) {
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					} catch (URISyntaxException e1) {
+					} catch (IOException | URISyntaxException e1) {
 						e1.printStackTrace();
 					}
 				}
