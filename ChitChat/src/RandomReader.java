@@ -37,10 +37,12 @@ public class RandomReader extends TimerTask {
 	public void run() {
 		String[] vrstice = this.text.split("\n");
 		int randomInt = ThreadLocalRandom.current().nextInt(0, vrstice.length);
+		//Izogibamo se temu da bi dvakrat izpisal isto vrstico
 		while (randomInt == this.prejsen){
 			randomInt = ThreadLocalRandom.current().nextInt(0, vrstice.length);
 		}
 		this.prejsen = randomInt;
+		//V tab "Server" napisemo nakljucno vrstico iz dane datoteke
 		chat.addMessage("Server", vrstice[randomInt], chat.tabTextAreaSlovar.get("Server"));
 	}
 
