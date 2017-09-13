@@ -1,5 +1,6 @@
 # ChitChat
-Projekt ChitChat za predmet Programiranje 2. Aplikacijo se zažene z datoteko ChitChat.java.
+Projekt ChitChat za predmet Programiranje 2. 
+Klepetalnik se povezuje s strežnikom na naslovu http://chitchat.andrej.com/. Zažene se ga z datoteko ChitChat.java.
 
 # Implementirana funkcionalnost
 - Nastavljiv vzdevek
