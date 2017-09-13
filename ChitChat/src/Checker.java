@@ -49,6 +49,8 @@ public class Checker extends TimerTask{
 		return navadenSeznam;
 	}
 	
+	//Vsako sekundo preveri kdo je online in osvezi seznamOnline v ChatFrame-u, ce je uporabnik prijavljen pa
+	//tudi osvezi sporocila v ChatFrame-u
 	@Override
 	public void run(){
 		try {
