@@ -318,7 +318,13 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 					try {
 						if (this.jePrijavljen(this.vzdevekInput.getText())){
 							this.addTab(this.prejemnik.getText(), true);
-							Send.send(this.vzdevekInput.getText(), this.prejemnik.getText(), this.input.getText());
+							if (this.prejemnik.getText().equals("Server")){
+								;
+							}else if (this.prejemnik.getText().equals("Vsi")){
+								Send.sendAll(this.vzdevekInput.getText(), this.input.getText());
+							} else {
+								Send.send(this.vzdevekInput.getText(), this.prejemnik.getText(), this.input.getText());
+							}
 							this.addMessage(this.vzdevekInput.getText(), this.input.getText(),
 									this.tabTextAreaSlovar.get(this.tabbedPane.getTitleAt(this.tabbedPane.getSelectedIndex())));
 							this.input.setText("");

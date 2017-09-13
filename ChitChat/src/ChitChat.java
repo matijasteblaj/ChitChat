@@ -12,6 +12,8 @@ public class ChitChat {
 		chatFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 //		PrimeRobot robot = new PrimeRobot(chatFrame);
 //		robot.activate();
+		RandomReader reader = new RandomReader(chatFrame, "src/Tekst.txt");
+		reader.activate();
 		Checker checker = new Checker(chatFrame);
 		checker.activate();
 		chatFrame.pack();

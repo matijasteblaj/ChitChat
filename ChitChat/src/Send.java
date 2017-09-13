@@ -14,15 +14,26 @@ public class Send {
 		          .addParameter("username", posiljatelj)
 		          .build();
 		
-		String global;
-		if (prejemnik.equals("Vsi")){
-			global = "true";
-		} else {
-			global = "false";
-		}
 		
-		String text = "{\"global\" : " + global + ", \"recipient\": \"" + prejemnik + "\", \"text\" : \"" + message + "\"  }";
+		
+		String text = "{\"global\" : false, \"recipient\": \"" + prejemnik + "\", \"text\" : \"" + message + "\"  }";
 
+		String responseBody = Request.Post(uri)
+		          .bodyString(text, ContentType.APPLICATION_JSON)
+		          .execute()
+		          .returnContent()
+		          .asString();
+		
+		System.out.println(responseBody);
+	}
+
+	public static void sendAll(String posiljatelj, String message) throws URISyntaxException, ClientProtocolException, IOException {
+		URI uri = new URIBuilder("http://chitchat.andrej.com/messages")
+		          .addParameter("username", posiljatelj)
+		          .build();
+		
+		String text = "{\"global\" : true, \"text\" : \"" + message + "\"  }";
+		
 		String responseBody = Request.Post(uri)
 		          .bodyString(text, ContentType.APPLICATION_JSON)
 		          .execute()
