@@ -7,5 +7,7 @@ Projekt ChitChat za predmet Programiranje 2. Aplikacijo se zažene z datoteko Ch
 - Spisek vseh prijavljenih ljudi, ki se posodobi vsako sekundo
 - Pošiljanje osebnih in globalnih sporočil
 - Zavihki za sledenje večim pogovorom, ob prejemu novega sporočila v neizbranem zavihku se ustrezen zavihek pobarva
+- Ob prejemu sporocila se odpre ali posodobi ustrezen zavihek
+- Ob odjavi se vsi zavihki (razen "Server") avtomatično zaprejo
 - Robot RandomReader, ki v zavihek "Server" piše naključno izbrane vrstice iz datoteke Tekst.txt v mapi src
 - Ob zaprtju aplikacije se uporabnik avtomatsko odjavi iz strežnika (če se že ni prej sam)
