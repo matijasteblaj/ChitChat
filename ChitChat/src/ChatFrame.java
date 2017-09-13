@@ -57,7 +57,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		Container pane = this.getContentPane();
 		pane.setLayout(new GridBagLayout());
 		
-		
+		//JPanel vzdevek, ki vsebuje napis, vzdevekInput in gumba prijava, odjava
 		this.vzdevek = new JPanel();
 		JLabel napis = new JLabel("Vzdevek:");
 		this.vzdevekInput = new JTextField(System.getProperty("user.name"), 40);
@@ -80,7 +80,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		pane.add(vzdevek, vzdevekConstraint);
 		vzdevek.addKeyListener(this);
 		
-		
+		//JPanel online, ki vsebuje napisOnline, onlineOutput
 		this.online = new JPanel();
 		JLabel napisOnline = new JLabel("Online:");
 		GridBagConstraints napisOnlineConstraint = new GridBagConstraints();
@@ -97,7 +97,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		pane.add(online, onlineConstraint);
 		online.addKeyListener(this);
 		
-
+		//JTabbedPane tabbedPane, katerega prvi tab je output
 		this.output = new JTextArea(20, 40);
 		this.output.setEditable(false);
 		GridBagConstraints outputConstraint = new GridBagConstraints();
@@ -109,11 +109,13 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 		JScrollPane scrollPane = new JScrollPane(output);
 		this.tabbedPane = new JTabbedPane();
+		//Slovar, ki bo povezoval imena tab-a in njegov JTextArea
 		this.tabTextAreaSlovar = new HashMap<String, JTextArea>();
 		tabbedPane.add("Server", scrollPane);
 		tabTextAreaSlovar.put("Server", output);
 		pane.add(tabbedPane, outputConstraint);
-
+		
+		//Jpanel inputPanel, ki vsebuje input, inputLabel, prejemnikLabel, prejemnik
 		this.inputPanel = new JPanel();
 		this.input = new JTextField(40);
 		this.prejemnikLabel = new JLabel("Prejemnik:");
@@ -131,7 +133,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		inputPanel.add(input);
 		pane.add(inputPanel, inputConstraint);
 		
-		
+		//Ko se klikne na tab, se nastavi prejemnik na naslov taba, in tab se pobarva na default barvo
 		tabbedPane.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent e){
 				prejemnik.setText(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
@@ -139,6 +141,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			}
 		});
 		
+		//Ko se okno odpre, gre fokus na textfield input
 		addWindowListener(new WindowAdapter(){
 			public void windowOpened(WindowEvent e) {
 				input.requestFocusInWindow();
@@ -148,11 +151,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.prijavljen = false;		
 	}
 
-	/**
-	 * @param person - the person sending the message
-	 * @param message - the message content
-	 * @param output - the JTextArea to which the message will be added
-	 */
+	//Izpise sporocilo "message" od osebe "person" v textarea output
 	public void addMessage(String person, String message, JTextArea output) {
 		if (this.tabTextAreaSlovar.keySet().size() == 0){
 			this.addTab("Vsi", true);
@@ -171,6 +170,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		}
 	}
 	
+	//Nastavi this.seznamOnline na "seznamOnline" in ustrezno popravi text v textarea onlineOutput
 	public void osveziOnline(String[] seznamOnline){
 		this.seznamOnline = seznamOnline;
 		String text = "";
@@ -180,9 +180,11 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		this.onlineOutput.setText(text);
 	}
 	
+	//Iz seznama prejetih sporocil "seznamSporocil" razbere posiljatelja in sporocilo, in doda sporocilo v ustrezen tab
 	public void osveziSporocila(String[] seznamSporocil){
 		for (int i=0; i < seznamSporocil.length; i += 3){
 			if (seznamSporocil[i].equals("true")){
+				this.addTab("Vsi", false);
 				this.addMessage(seznamSporocil[i+1], seznamSporocil[i+2], this.tabTextAreaSlovar.get("Vsi"));
 			} else if(seznamSporocil[i].equals("false")) {
 				this.addTab(seznamSporocil[i+1], false);
@@ -194,6 +196,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		}
 	}
 	
+	//Ce tab z imenom "prejemnik" se ne obstaja, ga naredi in se glede na "fokus" prestavi v njega ali pa ne
 	private void addTab(String prejemnik, boolean fokus){
 		if (!this.tabTextAreaSlovar.containsKey(prejemnik)){
 			JTextArea textArea = new JTextArea(20, 40);
@@ -202,6 +205,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			this.tabbedPane.add(prejemnik, scrollPane);
 			this.tabTextAreaSlovar.put(prejemnik, textArea);
 			
+			//Ime taba in gumb za zapiranje
 			JPanel panelTab = new JPanel();
 			JLabel tabTitle = new JLabel(prejemnik);
 			JButton closeButton = new JButton("x");
@@ -221,6 +225,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		}
 	}
 	
+	//Poskusi prijaviti uporabnika na streznik, vrne true ce je prijava uspela, false sicer
 	public boolean prijavi() throws ClientProtocolException, URISyntaxException, IOException{
 		if (!this.jePrijavljen(this.vzdevekInput.getText())){
 			Post.post(vzdevekInput.getText());
@@ -231,6 +236,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		
 	}
 	
+	//Poskusi odjaviti uporabnika iz streznika, vrne true ce je odjava uspela, false sicer
 	public boolean odjavi() throws ClientProtocolException, URISyntaxException, IOException{
 		if (this.jePrijavljen(this.vzdevekInput.getText())){
 			Delete.delete(vzdevekInput.getText());
@@ -241,7 +247,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	}
 
 
-	
+	//Funkcija, ki vrne true ce je uporabnik prijavljen na streznik in false sicer
 	public boolean jePrijavljen(String oseba) throws ClientProtocolException, IOException{
 		return Arrays.asList(this.seznamOnline).contains(this.vzdevekInput.getText());
 	}
@@ -249,6 +255,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
+		//Kliknjen je bil gumb prijava
 		if (action.equals("Prijava")){
 			try {
 				if (this.prijavi()){
@@ -267,6 +274,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}
+		//Kliknje je bil gumb odjava
 		} else if(action.equals("Odjava")){
 			try {
 				if (this.odjavi()){
@@ -298,6 +306,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			} catch (IOException | URISyntaxException e1) {
 				e1.printStackTrace();
 			}
+		//Kliknjen je bil gumb za zapiranje taba
 		}  else if(action.contains("Zbrisi")){
 			String prejemnik = action.split(" ")[1];
 			this.tabTextAreaSlovar.remove(prejemnik);
