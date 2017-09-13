@@ -70,6 +70,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 		prijava.setActionCommand("Prijava");
 		vzdevek.add(prijava);
 		this.odjava = new JButton("Odjava");
+		odjava.setEnabled(false);
 		odjava.addActionListener(this);
 		odjava.setActionCommand("Odjava");
 		vzdevek.add(odjava);
@@ -252,6 +253,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 			try {
 				if (this.prijavi()){
 					this.prijava.setEnabled(false);
+					this.odjava.setEnabled(true);
 					this.vzdevekInput.setEditable(false);
 					this.prijavljen = true;
 					if (this.tabTextAreaSlovar.keySet().size() == 0){
@@ -279,6 +281,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 						this.tabTextAreaSlovar.remove(tab);
 					}
 					this.prijava.setEnabled(true);
+					this.odjava.setEnabled(false);
 					this.vzdevekInput.setEditable(true);
 					this.prijavljen = false;
 					if (this.tabTextAreaSlovar.keySet().size() == 0){
