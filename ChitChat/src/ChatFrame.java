@@ -164,6 +164,7 @@ public class ChatFrame extends JFrame implements ActionListener, KeyListener {
 				key = kljuc;
 			}
 		}
+		//Ce trenutno ni izbran tab v katerem se je dodalo sporocilo, tab pobarvamo
 		int index = this.tabbedPane.indexOfTab(key);
 		if (!(this.tabbedPane.getSelectedIndex() == index)){
 			this.tabbedPane.setBackgroundAt(index, new Color(255, 204, 135));
